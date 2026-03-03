@@ -20,7 +20,7 @@ export function RoadmapViz({ roadmap }: Props) {
   const [filters, setFilters] = useState<FilterState>(defaultFilters);
   const [showLegend, setShowLegend] = useState(false);
   const [pan, setPan] = useState({ x: 0, y: 0 });
-  const [expandedHorizons, setExpandedHorizons] = useState(new Set<Horizon>());
+  const [expandedHorizons, setExpandedHorizons] = useState(new Set<Horizon>(['0-30d']));
   const [showAllEdges, setShowAllEdges] = useState(false);
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
   const [clusterState, setClusterState] = useState<ClusterState>(new Map());
