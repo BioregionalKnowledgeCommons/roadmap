@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback, useMemo } from 'react';
+import { useState, useRef, useCallback, useMemo, useEffect } from 'react';
 import type { Roadmap, RoadmapNode, LayoutNode, LaneId, Horizon, ClusterState } from './roadmap-types';
 import { LANE_CONFIGS } from './roadmap-types';
 import { computeLayout, LABEL_WIDTH, COL_HEADER_HEIGHT, SVG_PAD } from './roadmap-layout';
@@ -126,6 +126,45 @@ export function RoadmapViz({ roadmap }: Props) {
     }
     return ids;
   }, [activeId, layout.edges, edgeProxy]);
+
+  // ── External node selection (from chat widget) ────────────────────────────
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const nodeId = (e as CustomEvent<string>).detail;
+      if (!nodeId) return;
+
+      // Expand cluster if target node is hidden inside one
+      for (const [clusterId, members] of clusterMap.entries()) {
+        if (members.has(nodeId) && !(clusterState.get(clusterId) ?? false)) {
+          setClusterState((prev) => {
+            const next = new Map(prev);
+            next.set(clusterId, true);
+            return next;
+          });
+        }
+      }
+
+      // Find the layout node (may need to wait for re-render after cluster expand)
+      const layoutNode = layout.nodes.find((n) => n.id === nodeId);
+      if (layoutNode) {
+        setSelectedNode(layoutNode);
+      } else {
+        // Node might be in the raw roadmap but not yet laid out — select after cluster expands
+        const rawNode = roadmap.nodes.find((n) => n.id === nodeId);
+        if (rawNode) {
+          // Use a minimal LayoutNode shape so DetailPanel can display it
+          setSelectedNode({
+            ...rawNode,
+            x: 0, y: 0,
+            lane: 'demo' as LaneId,
+            horizon: rawNode.horizon as Horizon ?? '0-30d',
+          } as LayoutNode);
+        }
+      }
+    };
+    window.addEventListener('bkc-select-node', handler);
+    return () => window.removeEventListener('bkc-select-node', handler);
+  }, [layout.nodes, roadmap.nodes, clusterMap, clusterState]);
 
   // ── Pan interaction ──────────────────────────────────────────────────────────
   const onMouseDown = useCallback((e: React.MouseEvent) => {
