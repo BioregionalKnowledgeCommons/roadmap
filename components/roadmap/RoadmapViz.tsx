@@ -134,8 +134,8 @@ export function RoadmapViz({ roadmap }: Props) {
       if (!nodeId) return;
 
       // Expand cluster if target node is hidden inside one
-      for (const [clusterId, members] of clusterMap.entries()) {
-        if (members.has(nodeId) && !(clusterState.get(clusterId) ?? false)) {
+      for (const [clusterId, cluster] of clusterMap.entries()) {
+        if (cluster.memberIds.includes(nodeId) && !(clusterState.get(clusterId) ?? false)) {
           setClusterState((prev) => {
             const next = new Map(prev);
             next.set(clusterId, true);
