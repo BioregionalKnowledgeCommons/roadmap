@@ -3276,6 +3276,26 @@
         "rag",
         "testing"
       ]
+    },
+    {
+      "id": "work.b9.5-crag-gate",
+      "kind": "work_item",
+      "title": "B9.5 — CRAG confidence gate (telemetry-only)",
+      "summary": "Confidence signals (reranker score, entity match count, text result count, confidence spread) computed after retrieval and logged to plan_trace. Full retry/abstention behavior evaluated in Sprint 2 but disabled after 4 canonical runs showed quality-neutral results (-0.2% to +1.8% CR) with +4s latency. FlashRank scores too compressed (0.05-0.10) for meaningful discrimination. Infrastructure value: signals available for future analysis and v2 gating.",
+      "status": "done",
+      "priority": "P1",
+      "horizon": "30-90d",
+      "completed_date": "2026-03-31",
+      "owner": "owner.darren",
+      "source_docs": [
+        "docs/research/2026-summer-solstice-review.md"
+      ],
+      "tags": [
+        "rag",
+        "chat",
+        "evaluation",
+        "sprint-2"
+      ]
     }
   ],
   "edges": [
@@ -4818,6 +4838,16 @@
       "from": "work.b9a-baseline-comparison",
       "to": "work.golden-qa-100",
       "type": "depends_on"
+    },
+    {
+      "from": "work.b9a-baseline-comparison",
+      "to": "work.b9.5-crag-gate",
+      "type": "depends_on"
+    },
+    {
+      "from": "work.b9.5-crag-gate",
+      "to": "outcome.eval-driven-kg-chat",
+      "type": "delivers"
     }
   ]
 }
